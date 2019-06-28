@@ -3,7 +3,7 @@
 <!--This file is machine generated and read. It is not intended to be edited by hand.-->
 <!--Due to this, there is no schema for this file.-->
 <CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize" version="5" xml_contents_version="3" name="LL_PSOC_ECB3.1_WS" persistent="LL_PSOC_ECB3.1_WS.cywrk" platform="NOT_USED">
-<current_project name=".\P06_CAN_Full.cydsn\P06_CAN_Full.cyprj" />
+<current_project name=".\P04a_CAN_TX_Test.cydsn\P04a_CAN_TX_Test.cyprj" />
 <wrkspc_folders />
 <files />
 <projects>
@@ -12,8 +12,8 @@
 <v>.\P02_Blink_LED_Bootloadable.cydsn\P02_Blink_LED_Bootloadable.cyprj</v>
 <v>.\P03_USBUART_Control_LED.cydsn\P03_USBUART_Control_LED.cyprj</v>
 <v>.\P04_CAN_Basic.cydsn\P04_CAN_Basic.cyprj</v>
-<v>.\P05_CAN_Echo.cydsn\P05_CAN_Echo.cyprj</v>
-<v>.\P06_CAN_Full.cydsn\P06_CAN_Full.cyprj</v>
+<v>.\P04a_CAN_TX_Test.cydsn\P04a_CAN_TX_Test.cyprj</v>
+<v>.\P04b_CAN_RX_Test.cydsn\P04b_CAN_RX_Test.cyprj</v>
 </projects>
 <workspace_id v="7bb383c5-f4af-418e-b0b8-8563054e9a6e" />
 <WriteAppVersionLastSavedWith v="4.2.0.641" />
