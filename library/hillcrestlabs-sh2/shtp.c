@@ -453,18 +453,18 @@ static void processAdvertisement(shtp_t *pShtp, uint8_t *payload, uint16_t paylo
                 strcpy(appName, "");
                 strcpy(chanName, "");
                 break;
-            case TAG_MAX_CARGO_PLUS_HEADER_WRITE:
+            case TAG_MAX_CARGO_PLUS_HEADER_WRITE: //has the tag here in the input buffer
                 x = readu16(val) - SHTP_HDR_LEN;
             
                 if (x < SH2_HAL_MAX_PAYLOAD_OUT) {
                     pShtp->outMaxPayload = x;
                 }
                 break;
-            case TAG_MAX_CARGO_PLUS_HEADER_READ:
+            case TAG_MAX_CARGO_PLUS_HEADER_READ: //buffer never has tag for this value.
                 x = readu16(val) - SHTP_HDR_LEN;
                 // No need to store this!
                 break;
-            case TAG_MAX_TRANSFER_WRITE:
+            case TAG_MAX_TRANSFER_WRITE:        
                 x = readu16(val) - SHTP_HDR_LEN;
                 if (x < SH2_HAL_MAX_TRANSFER_OUT) {
                     pShtp->outMaxTransfer = x;
@@ -700,9 +700,7 @@ int shtp_listenChan(void *pInstance,
 }
 
 // Register a listener for SHTP advertisements 
-int shtp_listenAdvert(void *pInstance,
-                      uint16_t guid,
-                      shtp_AdvertCallback_t *advertCallback, void * cookie)
+int shtp_listenAdvert(void *pInstance,uint16_t guid,shtp_AdvertCallback_t *advertCallback, void * cookie)
 {
     shtp_t *pShtp = (shtp_t *)pInstance;
     
@@ -782,8 +780,9 @@ void shtp_service(void *pInstance)
         }
     }
 
-    int len = pShtp->pHal->read(pShtp->pHal, pShtp->inTransfer, sizeof(pShtp->inTransfer), &t_us);
+    volatile int len = pShtp->pHal->read(pShtp->pHal, pShtp->inTransfer, sizeof(pShtp->inTransfer), &t_us);
     if (len) {
+        //record how many times we go in here for our initial sh2_open()
         rxAssemble(pShtp, pShtp->inTransfer, len, t_us);
     }
 }

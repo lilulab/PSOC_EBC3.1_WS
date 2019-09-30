@@ -68,7 +68,7 @@
 #define PACKED_STRUCT __packed struct
 #endif
 
-#define ADVERT_TIMEOUT_US (200000)
+#define ADVERT_TIMEOUT_US 2000000//(200000) //2secs
 
 // Command and Subcommand values
 #define SH2_CMD_ERRORS                 1
@@ -218,8 +218,8 @@ struct sh2_s {
     
     volatile bool resetComplete;
     bool advertDone;
-    uint8_t executableChan;
-    uint8_t controlChan;
+    uint8_t executableChan; //Device channel: for reset, send commands, provide details of operation mode, on and sleep
+    uint8_t controlChan;    //SH-2 control, configures IMU, responses to config requests are sent through this channel. 
     char version[MAX_VER_LEN+1];
 
     // Report lengths
@@ -1673,8 +1673,10 @@ int sh2_open(sh2_Hal_t *pHal,
     sh2_t *pSh2 = &_sh2;
     
     // Validate parameters
-    if (pHal == 0) return SH2_ERR_BAD_PARAM;
-
+    if (pHal == 0)
+    {
+        return SH2_ERR_BAD_PARAM;
+    }
     // Clear everything in sh2 structure.
     memset(&_sh2, 0, sizeof(_sh2));
         
@@ -1689,7 +1691,7 @@ int sh2_open(sh2_Hal_t *pHal,
     pSh2->sensorCookie = 0;
 
     // Open SHTP layer
-    pSh2->pShtp = shtp_open(pSh2->pHal);
+    pSh2->pShtp = shtp_open(pSh2->pHal); //sh2_hal_open called here. 
     if (pSh2->pShtp == 0) {
         // Error opening SHTP
         return SH2_ERR;
@@ -1705,19 +1707,26 @@ int sh2_open(sh2_Hal_t *pHal,
 
     // Register EXECUTABLE handlers
     shtp_listenAdvert(pSh2->pShtp, GUID_EXECUTABLE, executableAdvertHdlr, &_sh2);
-    shtp_listenChan(pSh2->pShtp, GUID_EXECUTABLE, "device", executableDeviceHdlr, &_sh2);
+    shtp_listenChan(pSh2->pShtp, GUID_EXECUTABLE, "device", executableDeviceHdlr, &_sh2); //this handler makes resetComplete = 1
 
     // Wait for reset notifications to arrive.
     // The client can't talk to the sensor hub until that happens.
-    uint32_t start_us = pSh2->pHal->getTimeUs(pSh2->pHal);
-    uint32_t now_us = start_us;
-    while (((now_us - start_us) < ADVERT_TIMEOUT_US) &&
-           (!pSh2->resetComplete))
-    {
-        shtp_service(pSh2->pShtp);
+    volatile uint32_t start_us = pSh2->pHal->getTimeUs(pSh2->pHal);
+    volatile uint32_t now_us = start_us;
+    
+    char str[64];
+    volatile int count = 0;
+    while (((now_us - start_us) < ADVERT_TIMEOUT_US) && (!pSh2->resetComplete)) //IMU open() function hangs here           
+    {   
+//        sprintf(str,"resetComplete: %d\r\n",pSh2->resetComplete);
+//        printOut(str);
+//        
+//        sprintf(str,"now-start(us) < 200000: %d\r\n",(now_us-start_us));
+//        printOut(str);
+        
+        shtp_service(pSh2->pShtp);                                              
         now_us = pSh2->pHal->getTimeUs(pSh2->pHal);
     }
-    
     // No errors.
     return SH2_OK;
 }
